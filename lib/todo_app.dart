@@ -1,8 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
+
+import 'models/todo_model.dart';
 
 class TodoApp extends StatelessWidget {
-  final newTodoController = TextEditingController();
   TodoApp({super.key});
+
+  final newTodoController = TextEditingController();
+
+  final List<TodoModel> allTodos = [
+    TodoModel(id: const Uuid().v4(), description: "Spora Git"),
+    TodoModel(id: const Uuid().v4(), description: "Markete Git"),
+    TodoModel(id: const Uuid().v4(), description: "Alışverişe Git"),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +48,12 @@ class TodoApp extends StatelessWidget {
               newToltip("Completed", "Only completed todo"),
             ],
           ),
-          const listTileWidget(),
-          const listTileWidget(),
+          for (var i = 0; i < allTodos.length; i++)
+            Dismissible(
+              key: ValueKey(allTodos[i].id),
+              onDismissed: (_) {},
+              child: listTileWidget(item: allTodos[i]),
+            ),
         ],
       ),
     );
@@ -57,14 +71,13 @@ class TodoApp extends StatelessWidget {
 }
 
 class listTileWidget extends StatelessWidget {
-  const listTileWidget({
-    Key? key,
-  }) : super(key: key);
+  TodoModel item;
+  listTileWidget({super.key, required this.item});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      title: const Text("Spora Git"),
+      title: Text(item.description),
       leading: Checkbox(
         value: true,
         onChanged: (value) {},
