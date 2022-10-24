@@ -1,22 +1,19 @@
+// ignore_for_file: depend_on_referenced_packages
 import 'package:flutter/material.dart';
-// ignore: depend_on_referenced_packages
-import 'package:uuid/uuid.dart';
-
 import 'models/todo_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class TodoApp extends StatelessWidget {
+import 'providers/all_providers.dart';
+
+//ConsumerWidget
+class TodoApp extends ConsumerWidget {
   TodoApp({super.key});
 
   final newTodoController = TextEditingController();
 
-  final List<TodoModel> allTodos = [
-    TodoModel(id: const Uuid().v4(), description: "Spora Git"),
-    TodoModel(id: const Uuid().v4(), description: "Markete Git"),
-    TodoModel(id: const Uuid().v4(), description: "Alışverişe Git"),
-  ];
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    var allTodos = ref.watch(providerTodo);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -35,7 +32,9 @@ class TodoApp extends StatelessWidget {
           TextField(
             controller: newTodoController,
             decoration: const InputDecoration(labelText: "Neler Yapacaksın?"),
-            onSubmitted: (value) {},
+            onSubmitted: (newTodoText) {
+              ref.read(providerTodo.notifier).addTodo(newTodoText);
+            },
           ),
           const SizedBox(height: 20),
           Row(
@@ -54,7 +53,9 @@ class TodoApp extends StatelessWidget {
             Dismissible(
               background: Container(color: Colors.red),
               key: ValueKey(allTodos[i].id),
-              onDismissed: (_) {},
+              onDismissed: (_) {
+                ref.read(providerTodo.notifier).removeTodo(allTodos[i]);
+              },
               child: listTileWidget(item: allTodos[i]),
             ),
         ],

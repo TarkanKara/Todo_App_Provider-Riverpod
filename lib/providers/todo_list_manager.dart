@@ -3,19 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:todo_app/models/todo_model.dart';
 import 'package:uuid/uuid.dart';
 
-//Provider Oluşturma
-final providerTodo =
-    StateNotifierProvider<TodoListManager, List<TodoModel>>((ref) {
-  //Todo başlangıç verilerini burda belirtebiliriz
-  return TodoListManager(
-    [
-      TodoModel(id: const Uuid().v4(), description: "Spora Git"),
-      TodoModel(id: const Uuid().v4(), description: "Alışverişe Git"),
-      TodoModel(id: const Uuid().v4(), description: "Okula Git"),
-    ],
-  );
-});
-
 //Ana state olan içersinde todo ların olduğu bir liste
 //Liste dışardan aldığı parametre ile başlatılabilir
 //İçerisnde TodoModel olan liste verme işlemi
