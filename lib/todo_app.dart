@@ -50,6 +50,7 @@ class TodoApp extends StatelessWidget {
           ),
           for (var i = 0; i < allTodos.length; i++)
             Dismissible(
+              background: Container(color: Colors.red),
               key: ValueKey(allTodos[i].id),
               onDismissed: (_) {},
               child: listTileWidget(item: allTodos[i]),
