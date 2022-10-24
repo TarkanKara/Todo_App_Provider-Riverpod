@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:uuid/uuid.dart';
 
 import 'models/todo_model.dart';
@@ -49,7 +50,9 @@ class TodoApp extends StatelessWidget {
             ],
           ),
           for (var i = 0; i < allTodos.length; i++)
+            //Dismissible Widgeti sağa ve soğa kaydırarak silme işlemi
             Dismissible(
+              background: Container(color: Colors.red),
               key: ValueKey(allTodos[i].id),
               onDismissed: (_) {},
               child: listTileWidget(item: allTodos[i]),
