@@ -1,8 +1,7 @@
-// ignore_for_file: depend_on_referenced_packages
+// ignore_for_file: depend_on_referenced_packages, camel_case_types, must_be_immutable
 import 'package:flutter/material.dart';
 import 'models/todo_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'providers/all_providers.dart';
 
 //ConsumerWidget
@@ -74,12 +73,12 @@ class TodoApp extends ConsumerWidget {
     );
   }
 
-  Tooltip newToltip(String name, message) {
+  Tooltip newToltip(String listTileWidget, message) {
     return Tooltip(
       message: message,
       child: TextButton(
         onPressed: () {},
-        child: Text(name),
+        child: Text(listTileWidget),
       ),
     );
   }
@@ -111,19 +110,67 @@ class newComplatedTodo extends ConsumerWidget {
   }
 }
 
-class listTileWidget extends ConsumerWidget {
+class listTileWidget extends ConsumerStatefulWidget {
   TodoModel item;
   listTileWidget({super.key, required this.item});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      title: Text(item.description),
-      leading: Checkbox(
-        value: item.completed,
-        onChanged: (value) {
-          ref.read(providerTodo.notifier).toggle(item.id);
+  ConsumerState<ConsumerStatefulWidget> createState() => _listTileWidgetState();
+}
+
+class _listTileWidgetState extends ConsumerState<listTileWidget> {
+  late FocusNode textFocusNode;
+  late TextEditingController textController;
+  bool hasFocus = false;
+
+  @override
+  void initState() {
+    super.initState();
+    textFocusNode = FocusNode();
+    textController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    textFocusNode.dispose();
+    textController.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Focus(
+      onFocusChange: (isFocused) {
+        if (!isFocused) {
+          setState(
+            () {
+              hasFocus = false;
+            },
+          );
+          ref.read(providerTodo.notifier).todoEdit(
+              id: widget.item.id, newDescription: textController.text);
+        }
+      },
+      child: ListTile(
+        onTap: () {
+          setState(() {
+            hasFocus = true;
+            textController.text = widget.item.description;
+            textFocusNode.requestFocus();
+          });
         },
+        title: hasFocus
+            ? TextField(
+                controller: textController,
+                focusNode: textFocusNode,
+              )
+            : Text(widget.item.description),
+        leading: Checkbox(
+          value: widget.item.completed,
+          onChanged: (value) {
+            ref.read(providerTodo.notifier).toggle(widget.item.id);
+          },
+        ),
       ),
     );
   }
