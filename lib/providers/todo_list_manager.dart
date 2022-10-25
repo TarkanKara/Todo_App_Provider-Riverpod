@@ -52,4 +52,9 @@ class TodoListManager extends StateNotifier<List<TodoModel>> {
   void removeTodo(TodoModel removeTodoss) {
     state = state.where((element) => element.id != removeTodoss.id).toList();
   }
+
+  //Tamamlanmamış Todo Sayısı
+  int onCompletedTodoCount() {
+    return state.where((element) => !element.completed).length;
+  }
 }

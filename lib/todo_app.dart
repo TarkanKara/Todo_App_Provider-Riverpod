@@ -40,9 +40,20 @@ class TodoApp extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
-                child: Text("4 Todos"),
-              ),
+              const newComplatedTodo(),
+              /*
+              Expanded(
+                child: Text(
+                  ref
+                      .watch(providerTodo.notifier)
+                      .onCompletedTodoCount()
+                      .toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ), 
+              */
               newToltip("All", "All todos"),
               newToltip("Active", "Only Uncompleted todo"),
               newToltip("Completed", "Only completed todo"),
@@ -74,17 +85,45 @@ class TodoApp extends ConsumerWidget {
   }
 }
 
-class listTileWidget extends StatelessWidget {
+class newComplatedTodo extends ConsumerWidget {
+  const newComplatedTodo({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    /* int complatedTodos =
+        ref.watch(providerTodo.notifier).onCompletedTodoCount(); */
+    int complatedTodos =
+        ref.watch(providerTodo).where((element) => !element.completed).length;
+    return Expanded(
+      child: Text(
+        complatedTodos == 0
+            ? "Yeni Görev ekle"
+            : "$complatedTodos görev tamamlanmadı",
+        overflow: TextOverflow.ellipsis,
+        style: const TextStyle(
+          fontSize: 13,
+          color: Colors.red,
+        ),
+      ),
+    );
+  }
+}
+
+class listTileWidget extends ConsumerWidget {
   TodoModel item;
   listTileWidget({super.key, required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
       title: Text(item.description),
       leading: Checkbox(
-        value: true,
-        onChanged: (value) {},
+        value: item.completed,
+        onChanged: (value) {
+          ref.read(providerTodo.notifier).toggle(item.id);
+        },
       ),
     );
   }
