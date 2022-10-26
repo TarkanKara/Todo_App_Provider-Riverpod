@@ -19,8 +19,33 @@ final providerTodo = StateNotifierProvider<TodoListManager, List<TodoModel>>(
   },
 );
 
-final unCompletedTodoCount = Provider<int>((ref) {
-  final allTodo = ref.watch(providerTodo);
-  final count = allTodo.where((element) => !element.completed).length;
-  return count;
-});
+final unCompletedTodoCount = Provider<int>(
+  (ref) {
+    final allTodo = ref.watch(providerTodo);
+    final count = allTodo.where((element) => !element.completed).length;
+    return count;
+  },
+);
+
+enum TodoListFilter { all, active, completed }
+
+final todoListFilter =
+    StateProvider<TodoListFilter>(((ref) => TodoListFilter.all));
+
+final filteredTodoList = Provider<List<TodoModel>>(
+  (ref) {
+    final filter = ref.watch(todoListFilter);
+    final todoList = ref.watch(providerTodo);
+
+    switch (filter) {
+      case TodoListFilter.all:
+        return todoList;
+
+      case TodoListFilter.active:
+        return todoList.where((element) => element.completed).toList();
+
+      case TodoListFilter.completed:
+        return todoList.where((element) => !element.completed).toList();
+    }
+  },
+);

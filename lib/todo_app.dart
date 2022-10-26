@@ -8,11 +8,19 @@ import 'providers/all_providers.dart';
 class TodoApp extends ConsumerWidget {
   TodoApp({super.key});
 
+  var filterColor = TodoListFilter.all;
+
+  Color textFilterColor(TodoListFilter color) {
+    return filterColor == color ? Colors.green : Colors.black;
+  }
+
   final newTodoController = TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var allTodos = ref.watch(providerTodo);
+    var allTodos = ref.watch(filteredTodoList);
+    filterColor = ref.watch(todoListFilter);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -53,11 +61,42 @@ class TodoApp extends ConsumerWidget {
                 ),
               ), 
               */
-              newToltip("All", "All todos"),
-              newToltip("Active", "Only Uncompleted todo"),
-              newToltip("Completed", "Only completed todo"),
+              newToltip(
+                "All",
+                "All todos",
+                () {
+                  ref.read(todoListFilter.notifier).state = TodoListFilter.all;
+                },
+                textFilterColor(TodoListFilter.all),
+              ),
+              newToltip(
+                "Active",
+                "Only Uncompleted todo",
+                () {
+                  ref.read(todoListFilter.notifier).state =
+                      TodoListFilter.completed;
+                },
+                textFilterColor(TodoListFilter.completed),
+              ),
+              newToltip(
+                "Completed",
+                "Only completed todo",
+                () {
+                  ref.read(todoListFilter.notifier).state =
+                      TodoListFilter.active;
+                },
+                textFilterColor(TodoListFilter.active),
+              ),
             ],
           ),
+          allTodos.isEmpty
+              ? const Center(
+                  child: Text(
+                    " Görev Bulunamadı",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                )
+              : const SizedBox(),
           for (var i = 0; i < allTodos.length; i++)
             //Dismissible Widgeti sağa ve soğa kaydırarak silme işlemi
             Dismissible(
@@ -73,11 +112,15 @@ class TodoApp extends ConsumerWidget {
     );
   }
 
-  Tooltip newToltip(String listTileWidget, message) {
+  Tooltip newToltip(
+      String listTileWidget, message, void Function() onPress, Color colors) {
     return Tooltip(
       message: message,
       child: TextButton(
-        onPressed: () {},
+        style: TextButton.styleFrom(
+          foregroundColor: colors,
+        ),
+        onPressed: onPress,
         child: Text(listTileWidget),
       ),
     );
@@ -97,12 +140,12 @@ class newComplatedTodo extends ConsumerWidget {
         ref.watch(providerTodo).where((element) => !element.completed).length; */
     //Provider kullanıldı. Todo düzenleme sırasında bidaha tetiklenmesin diye
     int complatedTodos = ref.watch(unCompletedTodoCount);
-    print("tetiklend,");
+    print("tetiklendi");
     return Expanded(
       child: Text(
         complatedTodos == 0
             ? "Yeni Görev ekle"
-            : "$complatedTodos görev tamamlanmadı",
+            : "$complatedTodos görev tamamlanmadı!",
         overflow: TextOverflow.ellipsis,
         style: const TextStyle(
           fontSize: 13,
