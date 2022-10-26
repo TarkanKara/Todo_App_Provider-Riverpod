@@ -93,8 +93,11 @@ class newComplatedTodo extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     /* int complatedTodos =
         ref.watch(providerTodo.notifier).onCompletedTodoCount(); */
-    int complatedTodos =
-        ref.watch(providerTodo).where((element) => !element.completed).length;
+    /*  int complatedTodos =
+        ref.watch(providerTodo).where((element) => !element.completed).length; */
+    //Provider kullanıldı. Todo düzenleme sırasında bidaha tetiklenmesin diye
+    int complatedTodos = ref.watch(unCompletedTodoCount);
+    print("tetiklend,");
     return Expanded(
       child: Text(
         complatedTodos == 0
